@@ -57,6 +57,8 @@ def numeric_class_rule(a, b, exclusion_rule=None):
         range_rule = lambda label: (a <= label <= b)
     elif a > b:
         range_rule = lambda label: (label >= a or label <= b)
+    else:
+        print(a,b)
     return lambda label: (range_rule(label) and exclusion_rule(label))
 
 

@@ -3,18 +3,18 @@ testing_method: GlobalEmbeddingSpaceTester
 meta_testing_method: ConcatenateEmbeddings
 
 dataset:  
-  CUB200:
-num_epochs_train: 4
-iterations_per_epoch: 100
+  Logos:
+num_epochs_train: 2
+iterations_per_epoch: 10
 save_interval: 2
 
 special_split_scheme_name: null
-test_size: 0.5
-test_start_idx: 0.5
-num_training_partitions: 4
-num_training_sets: 4
+test_size: 0.4
+test_start_idx: 0.2
+num_training_partitions: 2
+num_training_sets: 2
 
 label_hierarchy_level: 0
-dataloader_num_workers: 2
+dataloader_num_workers: 0
 check_untrained_accuracy: True
 patience: null
