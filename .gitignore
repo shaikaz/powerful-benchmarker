@@ -2,3 +2,7 @@ __pycache__/
 *.py[cod]
 .nfs*
 *.sh
+.DS_Store
+datasets/CIFAR100_Dataset/*
+datasets/cub2011/*
+*/.DS_Store
