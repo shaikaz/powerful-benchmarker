@@ -11,6 +11,9 @@ import os
 import csv
 import pandas as pd
 from utils import common_functions as c_f
+
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
+
 logging.getLogger().setLevel(logging.INFO)
 
 BAYESIAN_KEYWORDS=("~BAYESIAN~", "~LOG_BAYESIAN~", "~INT_BAYESIAN~")
@@ -141,7 +144,7 @@ if __name__ == "__main__":
     finished_experiment_names = get_finished_experiment_names(root_experiment_folder)
 
     for i in range(num_explored_points, YR.args.bayesian_optimization_n_iter):
-        logging.info("Optimization iteration %d"%i)
+        logging.info("Optimization iteration %d" % i)
         experiment_path = get_latest_experiment_path(root_experiment_folder, experiment_name)
         parameters, trial_index = ax_client.get_next_trial()
         ax_client.complete_trial(trial_index=trial_index, raw_data=run_experiment(config_foldernames, parameters))
