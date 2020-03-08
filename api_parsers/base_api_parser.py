@@ -19,6 +19,8 @@ from collections import defaultdict
 
 class BaseAPIParser:
     def __init__(self, args):
+        pml_cf.NUMPY_RANDOM = np.random.RandomState()
+        logging.info("NUMPY_RANDOM = %s"%pml_cf.NUMPY_RANDOM)
         os.environ["TORCH_HOME"] = args.pytorch_home
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.args = args
@@ -206,11 +208,9 @@ class BaseAPIParser:
             miner, miner_params = self.pytorch_getter.get("miner", yaml_dict=miner_type, return_uninitialized=True)
             miner_params = copy.deepcopy(miner_params)
             if "loss_function" in miner_params:
-                loss_args = miner_params["loss_function"]
-                miner_params["loss_function"] = self.get_loss_function(loss_args)
+                miner_params["loss_function"] = self.get_loss_function(miner_params["loss_function"])
             if "mining_function" in miner_params:
-                miner_args = miner_params["mining_function"]
-                miner_params["mining_function"] = self.get_mining_function(miner_args)
+                miner_params["mining_function"] = self.get_mining_function(miner_params["mining_function"])
             return miner(**miner_params)
         return None
 
@@ -226,6 +226,9 @@ class BaseAPIParser:
         if loss == losses.MultipleLosses:
             loss_funcs = [self.get_loss_function({k:v}) for k,v in loss_params["losses"].items()]
             return loss(loss_funcs) 
+        if loss == losses.CrossBatchMemory:
+            if "loss" in loss_params: loss_params["loss"] = self.get_loss_function(loss_params["loss"])
+            if "miner" in loss_params: loss_params["miner"] = self.get_mining_function(loss_params["miner"])
         if c_f.check_init_arguments(loss, "num_classes"):
             loss_params["num_classes"] = self.split_manager.get_num_labels()
             logging.info("Passing %d as num_classes to the loss function"%loss_params["num_classes"])
@@ -311,19 +314,21 @@ class BaseAPIParser:
     def update_meta_record_keeper(self, split_scheme_name):
         if hasattr(self, "meta_accuracies"):
             for split in self.args.splits_to_eval:
-                best_split_accuracy = self.hooks.get_best_epoch_and_accuracy(self.tester_obj, split)[1]
-                if best_split_accuracy is not None:
-                    self.meta_accuracies[split]["average_best"][split_scheme_name] = best_split_accuracy
-                untrained_accuracy = self.hooks.get_accuracy_of_epoch(self.tester_obj, split, -1)
-                if untrained_accuracy is not None:
-                    self.meta_accuracies[split]["untrained"][split_scheme_name] = untrained_accuracy
+                _, _, best_split_accuracies = self.hooks.get_best_epoch_and_accuracies(self.tester_obj, split)
+                if best_split_accuracies is not None:
+                    for k, v in best_split_accuracies.items():
+                        self.meta_accuracies[split]["average_best_%s"%k][split_scheme_name] = v
+                untrained_accuracies = self.hooks.get_accuracies_of_epoch(self.tester_obj, split, -1)
+                if untrained_accuracies is not None:
+                    for k, v in untrained_accuracies.items():
+                        self.meta_accuracies[split]["untrained_%s"%k][split_scheme_name] = v
 
     def record_meta_logs(self):
         if hasattr(self, "meta_accuracies") and len(self.meta_accuracies) > 0:
             for split in self.args.splits_to_eval:
                 group_name = "meta_" + self.hooks.record_group_name(self.tester_obj, split)
-                averages = {"%s_%s"%(k, self.args.eval_metric_for_best_epoch): np.mean(list(v.values())) for k, v in self.meta_accuracies[split].items()}
-                standard_errors = {"SEM_%s_%s"%(k, self.args.eval_metric_for_best_epoch): scipy_stats.sem(list(v.values())) for k, v in self.meta_accuracies[split].items()}
+                averages = {k: np.mean(list(v.values())) for k, v in self.meta_accuracies[split].items()}
+                standard_errors = {"SEM_%s"%k: scipy_stats.sem(list(v.values())) for k, v in self.meta_accuracies[split].items()}
                 len_of_existing_record = len(self.meta_record_keeper.get_record(group_name)[list(averages.keys())[0]])
                 self.meta_record_keeper.update_records(averages, global_iteration=len_of_existing_record, input_group_name_for_non_objects=group_name)
                 self.meta_record_keeper.update_records(standard_errors, global_iteration=len_of_existing_record, input_group_name_for_non_objects=group_name)
@@ -332,10 +337,14 @@ class BaseAPIParser:
     def return_val_accuracy_and_standard_error(self):
         if hasattr(self, "meta_record_keeper"):
             group_name = "meta_" + self.hooks.record_group_name(self.tester_obj, "val")
-            mean = self.meta_record_keeper.get_record(group_name)["average_best_%s"%self.args.eval_metric_for_best_epoch][-1]
-            standard_error = self.meta_record_keeper.get_record(group_name)["SEM_average_best_%s"%self.args.eval_metric_for_best_epoch][-1]
+            for k, v in self.meta_record_keeper.get_record(group_name).items():
+                if self.args.eval_metric_for_best_epoch in k:
+                    if k.startswith("average_best"):
+                        mean = v[-1]
+                    elif k.startswith("SEM"):
+                        standard_error = v[-1]
             return mean, standard_error
-        return self.hooks.get_best_epoch_and_accuracy(self.tester_obj, "val")[1]
+        return self.hooks.get_best_epoch_and_accuracies(self.tester_obj, "val")[1]
 
     def maybe_load_models_and_records(self):
         if hasattr(self, "meta_pickler_and_csver"):
@@ -350,7 +359,7 @@ class BaseAPIParser:
         self.set_mining_function()
         self.set_optimizers()
         self.set_record_keeper()
-        self.hooks = logging_presets.HookContainer(self.record_keeper)
+        self.hooks = logging_presets.HookContainer(self.record_keeper, metric_for_best_epoch=self.args.eval_metric_for_best_epoch)
         self.tester_obj = self.pytorch_getter.get("tester", self.args.testing_method, self.get_tester_kwargs())
         self.trainer = self.pytorch_getter.get("trainer", self.args.training_method, self.get_trainer_kwargs())
         self.epoch = self.maybe_load_models_and_records()
@@ -363,7 +372,6 @@ class BaseAPIParser:
             "normalize_embeddings": self.args.eval_normalize_embeddings,
             "use_trunk_output": self.args.eval_use_trunk_output,
             "batch_size": self.args.eval_batch_size,
-            "metric_for_best_epoch": self.args.eval_metric_for_best_epoch,
             "data_device": self.device,
             "dataloader_num_workers": self.args.eval_dataloader_num_workers,
             "pca": self.args.eval_pca,
@@ -452,7 +460,7 @@ class BaseAPIParser:
         self.epoch = self.trainer.epoch + 1
 
     def eval(self, **kwargs):
-        best_epoch = self.hooks.get_best_epoch_and_accuracy(self.tester_obj, "val")[0]
+        best_epoch = self.hooks.get_best_epoch_and_accuracies(self.tester_obj, "val")[0]
         for name, epoch in {"-1": -1, "best": best_epoch}.items():
             self.eval_model(epoch, name, splits_to_eval=self.args.splits_to_eval, load_model=True, **kwargs)
         self.pickler_and_csver.save_records()
@@ -480,7 +488,7 @@ class BaseAPIParser:
         self.record_keeper = self.meta_record_keeper
         self.pickler_and_csver = self.meta_pickler_and_csver
         self.pickler_and_csver.load_records()
-        self.hooks = logging_presets.HookContainer(self.record_keeper, record_group_name_prefix=meta_model_getter.__name__)
+        self.hooks = logging_presets.HookContainer(self.record_keeper, record_group_name_prefix=meta_model_getter.__name__, metric_for_best_epoch=self.args.eval_metric_for_best_epoch)
         self.tester_obj = self.pytorch_getter.get("tester", 
                                                 self.args.testing_method, 
                                                 self.get_tester_kwargs())
