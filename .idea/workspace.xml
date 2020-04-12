@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="bd568cb8-07b8-42e2-bcc1-d8c6a2adbc20" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/powerful_benchmarker/datasets/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/powerful_benchmarker/datasets/__init__.py" afterDir="false" />
-    </list>
+    <list default="true" id="bd568cb8-07b8-42e2-bcc1-d8c6a2adbc20" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,7 +22,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/powerful_benchmarker/datasets/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="60">
@@ -36,7 +34,23 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="120">
+              <caret line="8" selection-start-line="8" selection-end-line="8" />
+            </state>
+          </provider>
+        </entry>
+      </file>
     </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -46,10 +60,11 @@
       <list>
         <option value="$PROJECT_DIR$/src/powerful_benchmarker/datasets/logos_dataset.py" />
         <option value="$PROJECT_DIR$/src/powerful_benchmarker/datasets/__init__.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" fullScreen="true">
+  <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
     <option name="width" value="1920" />
     <option name="height" value="1080" />
   </component>
@@ -68,20 +83,18 @@
             <path>
               <item name="powerful-benchmarker" type="b2602c69:ProjectViewProjectNode" />
               <item name="powerful-benchmarker" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="powerful-benchmarker" type="b2602c69:ProjectViewProjectNode" />
-              <item name="powerful-benchmarker" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="powerful_benchmarker" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="powerful-benchmarker" type="b2602c69:ProjectViewProjectNode" />
-              <item name="powerful-benchmarker" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="powerful_benchmarker" type="462c0819:PsiDirectoryNode" />
               <item name="datasets" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="powerful-benchmarker" type="b2602c69:ProjectViewProjectNode" />
+              <item name="powerful-benchmarker" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="powerful-benchmarker" type="b2602c69:ProjectViewProjectNode" />
+              <item name="powerful-benchmarker" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="powerful_benchmarker" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -120,8 +133,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1920" height="1080" extended-state="0" />
-    <editor active="true" />
+    <frame x="0" y="0" width="1920" height="1080" extended-state="6" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24223275" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -160,6 +172,13 @@
           <folding>
             <element signature="e#0#28#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" selection-start-line="8" selection-end-line="8" />
         </state>
       </provider>
     </entry>
