@@ -1,0 +1,22 @@
+training_method: MetricLossOnly
+testing_method: GlobalEmbeddingSpaceTester
+meta_testing_method: ConcatenateEmbeddings
+
+dataset:  
+  CUB200:
+num_epochs_train: 1000
+iterations_per_epoch: 100
+save_interval: 2
+
+special_split_scheme_name: null
+test_size: 0.5
+test_start_idx: 0.5
+num_training_partitions: 4
+num_training_sets: 4
+
+label_hierarchy_level: 0
+dataloader_num_workers: 2
+check_untrained_accuracy: True
+skip_eval_if_already_done: True
+skip_meta_eval_if_already_done: True
+patience: 9
