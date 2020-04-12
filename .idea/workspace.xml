@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="bd568cb8-07b8-42e2-bcc1-d8c6a2adbc20" name="Default Changelist" comment="" />
+    <list default="true" id="bd568cb8-07b8-42e2-bcc1-d8c6a2adbc20" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +66,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
+  <component name="ProjectFrameBounds" fullScreen="true">
     <option name="width" value="1920" />
     <option name="height" value="1080" />
   </component>
@@ -83,11 +85,6 @@
             <path>
               <item name="powerful-benchmarker" type="b2602c69:ProjectViewProjectNode" />
               <item name="powerful-benchmarker" type="462c0819:PsiDirectoryNode" />
-              <item name="datasets" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="powerful-benchmarker" type="b2602c69:ProjectViewProjectNode" />
-              <item name="powerful-benchmarker" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -95,6 +92,13 @@
               <item name="powerful-benchmarker" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="powerful_benchmarker" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="powerful-benchmarker" type="b2602c69:ProjectViewProjectNode" />
+              <item name="powerful-benchmarker" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="powerful_benchmarker" type="462c0819:PsiDirectoryNode" />
+              <item name="datasets" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -133,7 +137,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1920" height="1080" extended-state="6" />
+    <frame x="0" y="0" width="1920" height="1080" extended-state="0" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24223275" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
