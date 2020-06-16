@@ -2,11 +2,17 @@
  <a href="https://arxiv.org/abs/2003.08505">A Metric Learning Reality Check</a>
 </h2>
 <p align="center">
+	
+</h2>
+<p align="center">
+ <a href="https://badge.fury.io/py/powerful-benchmarker">
+     <img alt="PyPi version" src="https://badge.fury.io/py/powerful-benchmarker.svg">
+ </a>
+ 
 
 
-## [Benchmark results (in progress)](https://drive.google.com/open?id=1Y_stkiqlHA7HTMNrhyPCnYhR0oevphRR): 
-- [Spreadsheet #1: Train/val 50/50](https://docs.google.com/spreadsheets/d/1kiJ5rKmneQvnYKpVO9vBFdMDNx-yLcXV2wbDXlb-SB8/edit?usp=sharing)
-- [Spreadsheet #2: 4-fold cross validation, test on 2nd-half of classes](https://docs.google.com/spreadsheets/d/1brUBishNxmld-KLDAJewIc43A4EVZk3gY6yKe8OIKbY/edit?usp=sharing)
+## Benchmark results (in progress): 
+- [4-fold cross validation, test on 2nd-half of classes](https://docs.google.com/spreadsheets/d/1brUBishNxmld-KLDAJewIc43A4EVZk3gY6yKe8OIKbY/edit?usp=sharing)
 
 ## Benefits of this library
 1. Highly configurable
@@ -33,34 +39,13 @@ The easiest way to get started is to download the [example script](https://githu
 - dataset_root is where your datasets are located.
 - root_experiment_folder is where you want all experiment data to be saved.
 
-
-### Download and organize the datasets
-Download the datasets from here:
-- [CUB200](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html)
-- [Cars196](https://ai.stanford.edu/~jkrause/cars/car_dataset.html)
-- [Stanford Online Products](http://cvgl.stanford.edu/projects/lifted_struct)
-
-Organize them as follows:
-```
-<dataset_root>
-|-cub2011
-  |-attributes.txt
-  |-CUB_200_2011
-    |-images
-|-cars196
-  |-cars_annos.mat
-  |-car_ims
-|-Stanford_Online_Products
-  |-bicycle_final
-  |-cabinet_final
-  ...
-```
-
 ### Try a basic command
-The following command will run an experiment using the [default config files](https://github.com/KevinMusgrave/powerful-benchmarker/tree/master/powerful_benchmarker/configs)
+The following command will run an experiment using the [default config files](https://github.com/KevinMusgrave/powerful-benchmarker/tree/master/src/powerful_benchmarker/configs), as well as download the CUB200 dataset into your ```dataset_root```
 ```
-python run.py --experiment_name test1 
+python run.py --experiment_name test1 --dataset {CUB200: {download: True}}
 ```
+(For the rest of this readme, we'll assume the datasets have already been downloaded.)
+
 Experiment data is saved in the following format:
 ```
 <root_experiment_folder>
@@ -123,19 +108,28 @@ python run.py \
 ### Combine yaml files at the command line
 The following merges the ```with_cars196``` config file into the ```default``` config file, in the ```config_general``` category.
 ```
-python run.py --experiment_name test1 --config_general default with_cars196
+python run.py --experiment_name test1 --config_general [default, with_cars196]
 ```
 This is convenient when you want to change a few settings (specified in ```with_cars196```), and keep all the other options unchanged (specified in ```default```). You can specify any number of config files to merge, and they get loaded and merged in the order that you specify.
 
 ### Resume training
-The following resumes training for the ```test1``` experiment:
+The following resumes training for the ```test1``` experiment, using the latest saved models.
 ```
-python run.py --experiment_name test1 --resume_training
+python run.py --experiment_name test1 --resume_training latest
 ```
+
+You can also resume using the model with the best validation accuracy:
+```
+python run.py --experiment_name test1 --resume_training best
+```
+
 Let's say you finished training for 100 epochs, and decide you want to train for another 50 epochs, for a total of 150. You would run:
 ```
-python run.py --experiment_name test1 --resume_training --num_epochs_train 150
+python run.py --experiment_name test1 --resume_training latest \
+--num_epochs_train 150 --merge_argparse_when_resuming
 ```
+(The ```merge_argparse_when_resuming``` tells the code that you want to make changes to the original experiment configuration. If you don't use this flag, then the code will ignore your command line arguments, and use the original configuration. The purpose of this is to avoid accidentally changing configs in the middle of an experiment.)
+
 Now in your experiments folder you'll see the original config files, and a new folder starting with ```resume_training```.
 ```
 <root_experiment_folder>
@@ -153,17 +147,27 @@ The underscore delimited numbers in the folder name indicate which models were l
 ### Reproducing benchmark results
 To reproduce an experiment from the benchmark spreadsheets, use the ```--reproduce_results``` flag:
 1. In the benchmark spreadsheet, click on the google drive link under the "config files" column.
-2. Download the folders you want (for example ```cub200_old_approach_triplet_batch_all```), into some folder on your computer. For example, I downloaded into ```/home/tkm45/experiments_to_reproduce```
+2. Download the folders you want (for example ```cub200_old_approach_triplet_batch_all```), into some folder on your computer. For example, I downloaded into ```/home/experiments_to_reproduce```
 3. Then run:
 ```
-python run.py --reproduce_results /home/tkm45/experiments_to_reproduce/cub200_old_approach_triplet_batch_all \
+python run.py --reproduce_results /home/experiments_to_reproduce/cub200_old_approach_triplet_batch_all \
 --experiment_name cub200_old_approach_triplet_batch_all_reproduced
 ```
+If you'd like to change some parameters when reproducing results, you can either make those changes in the config files, or at the command line. For example, maybe you'd like to change the number of dataloaders:
+```
+python run.py --reproduce_results /home/experiments_to_reproduce/cub200_old_approach_triplet_batch_all \
+--experiment_name cub200_old_approach_triplet_batch_all_reproduced \
+--dataloader_num_workers 16 \
+--eval_dataloader_num_workers 16 \
+--merge_argparse_when_resuming
+```
+The ```merge_argparse_when_resuming``` flag is required in order to use a different configuration from the one in the ```reproduce_results``` folder.
+
 
 ### Evaluation options
 By default, your model will be saved and evaluated on the validation set every ```save_interval``` epochs.
 
-To get accuracy for specific splits, use the ```--splits_to_eval``` flag and pass in a space-delimited list of split names. For example ```--splits_to_eval train test```
+To get accuracy for specific splits, use the ```--splits_to_eval``` flag and pass in a python-style list of split names. For example ```--splits_to_eval [train, test]```
 
 To run evaluation only, use the ```--evaluate``` flag.
 
@@ -199,7 +203,9 @@ python run.py --bayes_opt_iters 50 \
 --experiment_name cub_bayes_opt \
 ```
 
-If you stop and want to resume bayesian optimization, simply use ```run.py``` with the same ```experiment_name``` you were using before. (Do not use the ```resume_training``` flag.) 
+If you stop and want to resume bayesian optimization, simply use ```run.py``` with the same ```experiment_name``` you were using before. 
+
+You can change the optimization bounds when resuming, by either changing the bounds in your config files or at the command line. If you're using the command line, make sure to also use the ```--merge_argparse_when_resuming``` flag.
 
 You can also run a number of reproductions for the best parameters, so that you can obtain a confidence interval for your results. Use the ```reproductions``` flag, and pass in the number of reproductions you want to perform at the end of bayesian optimization.
 
@@ -279,8 +285,6 @@ r.register("api_parser", APIYourTrainer)
 r.run()
 ```
 
-If your trainer's ```__init__``` arguments are identical to the one you're extending, then you can just set ```APIYourTrainer = api_parsers.BaseAPIParser```. (Note that ```BaseAPIParser``` is the same as ```APIMetricLossOnly```)
-
 
 ## Config options guide
 Below is the format for the various config files. Click on the links to see the default yaml file for each category.
@@ -289,11 +293,12 @@ Below is the format for the various config files. Click on the links to see the 
 ```yaml
 training_method: <type> #options: MetricLossOnly, TrainWithClassifier, CascadedEmbeddings, DeepAdversarialMetricLearning
 testing_method: <type> #options: GlobalEmbeddingSpaceTester, WithSameParentLabelTester
-meta_testing_method: <type> #options: null or ConcatenateEmbeddings
+meta_testing_method: <list> #options: meta_SeparateEmbeddings or meta_ConcatenateEmbeddings
 dataset:  
   <type>: #options: CUB200, Cars196, StanfordOnlineProducts
     <kwarg>: <value>
     ...
+splits_to_eval: <list> #strings corresponding to dataset split names, i.e. train, val, test.
 num_epochs_train: <how long to train for>
 iterations_per_epoch: <Optional. If set, an epoch will simply be a fixed number of iterations. Or you can set this to null or 0, and it will be ignored.>
 save_interval: <how often (in number of epochs) models will be saved and evaluated>
@@ -306,6 +311,8 @@ num_training_sets: <int> #number of partitions that are actually used as trainin
 label_hierarchy_level: <number>
 dataloader_num_workers: <number>
 check_untrained_accuracy: <boolean>
+skip_eval_if_already_done: <boolean>
+skip_meta_eval_if_already_done: <boolean>
 patience: <int> #Training will stop if validation accuracy has not improved after this number of epochs. If null, then it is ignored.
 
 ```
@@ -381,14 +388,29 @@ eval_batch_size: <number>
 eval_metric_for_best_epoch: <name> #options: NMI, precision_at_1, r_precision, mean_average_r_precision
 eval_dataloader_num_workers: <number>
 eval_pca: <number> or null #options: number of dimensions to reduce embeddings to via PCA, or null if you don't want to use PCA.
-eval_size_of_tsne: <number> #The number of samples per split that you want to visualize via TSNE. Set to 0 if you don't want a TSNE plot.
+eval_accuracy_calculator:
+  <type>
+    <kwarg>: <value>
 ```
 
 ## Acknowledgements
 Thank you to Ser-Nam Lim at Facebook AI, and my research advisor, Professor Serge Belongie. This project began during my internship at Facebook AI where I received valuable feedback from Ser-Nam, and his team of computer vision and machine learning engineers and research scientists.
 
-## Citing this library
-If you'd like to cite powerful-benchmarker in your paper, you can use this bibtex:
+## Citing the benchmark results
+If you'd like to cite the benchmark results, please cite this paper:
+```latex
+@misc{musgrave2020metric,
+    title={A Metric Learning Reality Check},
+    author={Kevin Musgrave and Serge Belongie and Ser-Nam Lim},
+    year={2020},
+    eprint={2003.08505},
+    archivePrefix={arXiv},
+    primaryClass={cs.CV}
+}
+```
+
+## Citing the code
+If you'd like to cite the powerful-benchmarker code, you can use this bibtex:
 ```latex
 @misc{Musgrave2019,
   author = {Musgrave, Kevin and Lim, Ser-Nam and Belongie, Serge},
